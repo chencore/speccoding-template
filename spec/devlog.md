@@ -31,6 +31,29 @@
 
 <!-- 最新条目在最上面 -->
 
+### 2026-06-20 · integrate-pi-agent
+
+**摘要**：集成 pi-agent-core + pi-ai，封装 `AgentService`（默认 DeepSeek v4 pro），实现 echo demo 工具 + `/api/v1/agent/ask`，为后续选题/文案业务模块提供 AI 底座。
+
+**关键决策**：
+- pi-ai 原生支持 DeepSeek——`getModel("deepseek","deepseek-v4-pro")` 直接取，env 变量 `DEEPSEEK_API_KEY` 自动读取（消除 kickoff 待定项）
+- 每请求新建 Agent（无状态），非流式响应——v0.1 单轮场景足够
+- AgentTool 需显式传 `<TParameters, TDetails>` 泛型 + execute params 标注 `Static<TParameters>` 类型，否则推断 unknown
+- 无 key 时 agent 不抛异常而是返回 `stopReason:"error"` + `errorMessage` 的消息——`ask()` 主动检测并抛错，路由层转 503
+- 测试降级：原计划 mock streamFn，但 `AssistantMessageEventStream` 子路径未在 pi-ai exports 暴露；降级为直接测 echo.execute + 测无 key 时 ask 抛错
+
+**踩坑 / 经验**：
+- pi-ai 的 `./utils/event-stream` 子路径有 types 但运行时 exports 不暴露——不能直接 `import` 构造 mock EventStream
+- Biome 的 `noDelete` 规则禁用 `delete` 操作符，测试改用 `vi.stubEnv`
+- `npx biome check --fix` 只修安全 fix，`organizeImports` 部分需 `--unsafe`
+
+**相关产出**：
+- 归档位置：`openspec/changes/archive/2026-06-20-integrate-pi-agent/`
+- 主规格同步：`openspec/specs/agent/spec.md`（新建）
+- 父分支：`version/v0.1`
+- `spec/design.md` 待定项"pi-ai 是否原生支持 DeepSeek"已消除
+- 待验证：用户填 `DEEPSEEK_API_KEY` 后手动 curl `/api/v1/agent/ask` 验证真实调用
+
 ### 2026-06-20 · setup-project-scaffold
 
 **摘要**：搭建前后端可运行骨架（Next.js 15 + Hono + SQLite），v0.1 第一个 task 落地，为后续 pi-agent 集成与业务功能提供地基。
