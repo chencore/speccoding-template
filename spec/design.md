@@ -74,5 +74,5 @@
 
 ## 7. 待定项（Open Questions）
 
-- **pi-ai 是否原生支持 DeepSeek**：若不原生，走 OpenAI 兼容 API 接入。留到 design 阶段（首个 openspec 变更）验证，不阻塞 kickoff。
+- ~~**pi-ai 是否原生支持 DeepSeek**~~：**已解决（2026-06-20，integrate-pi-agent）**——pi-ai 原生支持，`KnownProvider` 含 `"deepseek"`，`MODELS.deepseek["deepseek-v4-pro"]` 预置完整（baseUrl `https://api.deepseek.com`，api `openai-completions`，`thinkingFormat: "deepseek"`）。取模型用 `getModel("deepseek", "deepseek-v4-pro")`，env 变量 `DEEPSEEK_API_KEY` 自动读取。
 - **历史数据导入的 CSV schema**：字段需对齐 YouTube 频道后台导出格式，首个涉及导入的变更再定。
