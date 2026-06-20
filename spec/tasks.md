@@ -20,7 +20,7 @@
 
 - [x] **setup-project-scaffold** — 前后端骨架（Next.js + Hono）、SQLite 初始化、环境变量
 - [x] **integrate-pi-agent** — pi-agent-core + pi-ai 集成，DeepSeek v4 pro 默认配置，自定义工具注册框架
-- [ ] **topic-inspiration** — 选题灵感生成（AI）+ 历史数据导入（CSV/粘贴）
+- [x] **topic-inspiration** — 选题灵感生成（AI）+ 历史数据导入（CSV/粘贴）
 - [ ] **copy-generation** — 文案生成（标题/描述/标签，多版本 A/B）
 - [ ] **persistence-and-history** — SQLite 三表 + 历史记录/版本对比/采用标记 UI
 
@@ -30,5 +30,5 @@
 
 - 当前版本：v0.1
 - 总任务数：5
-- 已完成：2
+- 已完成：3
 - 进行中：0
