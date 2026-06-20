@@ -49,6 +49,14 @@
 ### copy_versions
 - `id`, `copy_id`, `version_no`, `content`, `is_adopted`, `created_at`
 
+### imported_videos `[v0.1 新增 · topic-inspiration]`
+- `id`, `title`(历史视频标题), `views`(播放量，可空), `imported_at`
+- 用途：手动导入的历史频道数据，作为选题生成参考输入（避免重复 + 找新角度）
+
+### channel_config `[v0.1 新增 · topic-inspiration]`
+- `key`(主键，当前仅 `channel_description`), `value`, `updated_at`
+- 用途：key-value 结构存频道描述等配置，生成选题时注入 prompt
+
 ## 5. 关键接口约定
 
 - **鉴权**：v0.1 无鉴权（单人本地）；预留中间位以便后续加
