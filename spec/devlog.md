@@ -31,6 +31,31 @@
 
 <!-- 最新条目在最上面 -->
 
+### 2026-06-20 · topic-inspiration
+
+**摘要**：实现选题环节——AI 选题生成（种子词 + 频道描述 + 历史数据）、历史导入（粘贴/CSV）、选题工作台前端页，v0.1 首个业务功能闭环。
+
+**关键决策**：
+- 纯 prompt 不用工具：历史数据直接塞进 prompt，不注册 `list_imported_videos` 工具——选题是单轮生成，工具调用增不确定性
+- AI 严格输出 JSON 数组，后端 `JSON.parse` + strip markdown 代码块；解析失败返 502 + 原文
+- 新建 `imported_videos` 表而非复用 `topics`——导入数据是参考素材非选题产物，语义不同（已提升到 spec/design.md）
+- `channel_config` 用 key-value 单表——单一字段建整表过重，可扩展
+- CSV 手写解析（split + strip 引号），不引库；schema 固定 `title,views` 两列
+- 前端原生 HTML + 内联样式，不引 UI 库
+
+**踩坑 / 经验**：
+- better-sqlite3 的 `.get(undefined)` 会抛 "Too many parameter values"——无参数查询时不能传 undefined，需分支调用
+- Hono multipart 用 `c.req.parseBody()`，返回的 `body.file` 是 `File` 实例（非 Buffer），需 `await file.arrayBuffer()` 再转
+- Next.js 会在 frontend 下生成 `tsconfig.tsbuildinfo`，需补 gitignore
+- `vi.mock` 路径要用相对路径 + `.js` 扩展（与 ESM import 一致）
+
+**相关产出**：
+- 归档位置：`openspec/changes/archive/2026-06-20-topic-inspiration/`
+- 主规格同步：`openspec/specs/topic/spec.md`（新建）
+- `spec/design.md` 第 4 节追加 `imported_videos` + `channel_config` 两表
+- 父分支：`version/v0.1`
+- 待验证：用户填 `DEEPSEEK_API_KEY` 后真实生成选题
+
 ### 2026-06-20 · integrate-pi-agent
 
 **摘要**：集成 pi-agent-core + pi-ai，封装 `AgentService`（默认 DeepSeek v4 pro），实现 echo demo 工具 + `/api/v1/agent/ask`，为后续选题/文案业务模块提供 AI 底座。
