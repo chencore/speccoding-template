@@ -1,6 +1,6 @@
 # Design
 
-> **维护规则**：本文件是**项目整体设计与架构决策**，仅在**人工明确要求**时修改。AI 不得擅自更新。
+> **维护规则**：本文件是**项目整体设计与架构决策**，仅在人工明确要求时修改。AI 不得擅自更新。
 
 ---
 
@@ -8,57 +8,71 @@
 
 | 层 | 选型 | 理由 |
 |----|------|------|
-| 前端 | TODO | TODO |
-| 后端 | TODO | TODO |
-| 数据库 | TODO | TODO |
-| 部署 | TODO | TODO |
+| 前端 | Next.js (App Router) + TypeScript | 单人工作台、迭代快；TS 全栈统一语言 `[v0.1 新增]` |
+| 后端 | Node.js + Hono + TypeScript | 轻量、TS 原生；可直接 `import` pi-agent-core 库 `[v0.1 新增]` |
+| 数据库 | SQLite (better-sqlite3) | 本地文件、零运维、单人无并发压力；后期可换 Postgres `[v0.1 新增]` |
+| AI 框架 | `@earendil-works/pi-agent-core` + `pi-ai` | 库集成（非子进程），统一 LLM 接口，自定义工具注册 `[v0.1 新增]` |
+| LLM | 默认 DeepSeek v4 pro，多家混用可切换 | 经 pi-ai 抽象，不锁死供应商 `[v0.1 新增]` |
+| 部署 | 本地 `npm run dev` | v0.1 不上云 `[v0.1 新增]` |
 
 ## 2. 系统架构
 
-<!-- 系统分为几层？模块之间如何交互？画一张简单的方框图或用文字描述 -->
-
 ```
-[ Client ] ─── [ API Gateway ] ─── [ Services ] ─── [ Database ]
+[ Next.js 前端 (浏览器) ]
+        │  HTTP
+        ▼
+[ Hono 后端 API ]
+        │
+        ├──→ [ pi-agent-core 运行时 ]  ← 注册自定义工具
+        │         │
+        │         ▼
+        │    [ pi-ai → DeepSeek v4 pro / 其他 ]
+        │
+        └──→ [ SQLite (topics / copies / copy_versions) ]
 ```
-
-TODO
 
 ## 3. 模块划分
 
-<!-- 列出所有主要模块，每个模块一句话说清楚职责边界 -->
-
-- **auth** — TODO
-- **xxx** — TODO
+- **topic** — 选题灵感生成、历史数据导入
+- **copy** — 文案生成（标题/描述/标签）、多版本对比、采用标记
+- **agent** — pi-agent-core 封装、自定义工具注册、LLM 供应商切换
+- **persistence** — SQLite 三表读写、历史记录查询
 
 ## 4. 数据模型（核心实体）
 
-<!-- 只列核心实体和它们的关键字段、关系——不要详尽到字段级 -->
+### topics
+- `id`, `seed`(种子词/导入来源), `title`(选题标题), `rationale`(AI 推荐理由), `status`(待用/采用/弃用), `created_at`
 
-### User
-- `id`, `email`, `created_at`, ...
+### copies
+- `id`, `topic_id`(关联选题), `type`(title/description/tags), `adopted_version_id`(当前采用版本), `created_at`
 
-### TODO
-- TODO
+### copy_versions
+- `id`, `copy_id`, `version_no`, `content`, `is_adopted`, `created_at`
 
 ## 5. 关键接口约定
 
-<!-- 跨模块调用的协议、鉴权方式、错误规范 -->
-
-- **鉴权**：TODO（JWT / Session / OAuth ?）
-- **错误码**：TODO
-- **版本化**：TODO
+- **鉴权**：v0.1 无鉴权（单人本地）；预留中间位以便后续加
+- **错误码**：HTTP 标准状态码 + `{ error: string }` body
+- **版本化**：API 前缀 `/api/v1`
 
 ## 6. 关键决策与权衡
 
-<!-- 架构上做过的重要取舍，写清楚选择了什么、放弃了什么、为什么 -->
+### 决策 1：pi 库集成 vs 子进程 `[v0.1 新增]`
+- **选择**：库集成（`import pi-agent-core`）
+- **放弃的方案**：spawn `pi-coding-agent` CLI 走 stdio
+- **理由**：后端 Node/TS 原生兼容；交互更直接；自定义工具注册更顺；隔离性损失可接受（单人本地）
 
-### 决策 1：TODO
-- **选择**：TODO
-- **放弃的方案**：TODO
-- **理由**：TODO
+### 决策 2：深切片 v0.1 只做选题+文案 `[v0.1 新增]`
+- **选择**：1-2 环节做深
+- **放弃的方案**：六环节各做 MVP 串联
+- **理由**：单人项目工期有限；选题+文案 AI 加持价值最高且无重资产依赖；音视频处理放后续降低技术风险
+
+### 决策 3：DeepSeek v4 pro 默认 + 多家可切换 `[v0.1 新增]`
+- **选择**：经 pi-ai 抽象，默认 DeepSeek v4 pro
+- **放弃的方案**：锁单一供应商
+- **理由**：不同环节可能用不同模型更优；pi-ai 抽象使切换成本趋零
 
 ## 7. 待定项（Open Questions）
 
-<!-- 尚未拍板的设计问题——留着定期回顾 -->
-
-- TODO
+- **pi-ai 是否原生支持 DeepSeek**：若不原生，走 OpenAI 兼容 API 接入。留到 design 阶段（首个 openspec 变更）验证，不阻塞 kickoff。
+- **历史数据导入的 CSV schema**：字段需对齐 YouTube 频道后台导出格式，首个涉及导入的变更再定。

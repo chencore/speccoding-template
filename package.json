@@ -1,0 +1,13 @@
+{
+  "name": "tiantian-cut",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n frontend,backend -c blue,green \"npm -C frontend run dev\" \"npm -C backend run dev\"",
+    "lint": "biome check .",
+    "format": "biome format --write ."
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "@biomejs/biome": "^1.9.4"
+  }
+}
