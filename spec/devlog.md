@@ -31,6 +31,28 @@
 
 <!-- 最新条目在最上面 -->
 
+### 2026-06-20 · setup-project-scaffold
+
+**摘要**：搭建前后端可运行骨架（Next.js 15 + Hono + SQLite），v0.1 第一个 task 落地，为后续 pi-agent 集成与业务功能提供地基。
+
+**关键决策**：
+- 前后端各自 package.json + 根 concurrently 编排，不引 pnpm workspace
+- better-sqlite3 + 手写 SQL，不上 ORM
+- Biome 一体化（与 pi 生态对齐），放弃 ESLint+Prettier
+- SQLite 文件落 `backend/data/app.db`，`.gitignore` 补 db 规则
+- ESM 后端（`type: module` + `.js` 扩展名 import）
+
+**踩坑 / 经验**：
+- macOS 无 `timeout` 命令，验证 dev server 改用后台启动 + `pkill`
+- Biome 的 `organizeImports` 属 linter，`biome format --write` 不修，需 `biome check --fix`
+- Next.js 15 首次启动会自动给 tsconfig 加 `isolatedModules: true`（正常行为）
+
+**相关产出**：
+- 归档位置：`openspec/changes/archive/2026-06-20-setup-project-scaffold/`
+- 主规格同步：`openspec/specs/scaffold/spec.md`（新建）
+- 父分支：`version/v0.1`
+- 健康检查：`GET http://localhost:3001/api/v1/health` → `{"status":"ok","db":"connected",...}`
+
 ### 2026-06-20 · v0.1 kickoff
 
 **摘要**：版本 v0.1 首次 kickoff，确立深切片范围（选题+文案）、pi 库集成方式、DeepSeek v4 pro 默认 LLM。
