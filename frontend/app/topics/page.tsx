@@ -314,6 +314,16 @@ export default function TopicsPage() {
                   <div
                     style={{ display: "flex", flexDirection: "column", gap: 4 }}
                   >
+                    <a
+                      href={`/topics/${t.id}`}
+                      style={{
+                        ...smallBtnStyle,
+                        textDecoration: "none",
+                        textAlign: "center",
+                      }}
+                    >
+                      文案
+                    </a>
                     {t.status !== "adopted" && (
                       <button
                         type="button"
