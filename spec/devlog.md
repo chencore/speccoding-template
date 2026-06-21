@@ -31,6 +31,33 @@
 
 <!-- 最新条目在最上面 -->
 
+### 2026-06-21 · copy-generation
+
+**摘要**：实现文案环节——基于选题一键生成 YouTube 标题（5 版）/ 描述（2 版）/ 标签（1 版），支持版本改写迭代与采用切换，前端 `/topics/:id` 详情页承载生成、查看、采用、改写全流程。
+
+**关键决策**：
+- 一次生成三类而非分类生成：标题、描述、标签相互关联，单 prompt 输出 JSON 更连贯
+- 版本数差异化：标题 5 版（CTR 核心）、描述 2 版、标签 1 版，避免无意义膨胀
+- 初始版本不自动 adopted：强制用户做 A/B 决策，符合"多版本对比"意图
+- 改写输出纯文本非 JSON：单版本场景下 JSON 反而增加解析失败率
+- 采用事务化：同 copy 全版本清 adopted + 目标版本标 adopted + 更新 copies.adopted_version_id
+- 复用既有 `copies` + `copy_versions` 表，无 schema 变更
+
+**踩坑 / 经验**：
+- `npm -C backend run dev` 会切换后端 cwd，导致 `dotenv/config` 加载不到根目录 `.env`——改 `config.ts` 显式从 `__dirname/../../.env` 加载
+- 前端调后端触发 CORS 预检（OPTIONS），Hono 默认不处理——加 `hono/cors` 中间件
+- Biome `noNonNullAssertion` 规则禁用 `!`：测试里用 `findCopy`/`findVersion` 辅助函数替代
+- Next.js 弹窗遮罩触发 `useKeyWithClickEvents` / `useSemanticElements`：用 `biome-ignore` 注释处理简单 modal 场景
+
+**相关产出**：
+- 归档位置：`openspec/changes/archive/2026-06-21-copy-generation/`
+- 主规格同步：`openspec/specs/copy/spec.md`（新建）
+- 父分支：`version/v0.1`
+- 新增模块：`backend/src/copy/*`、`backend/src/routes/copy.ts`、`frontend/app/topics/[id]/page.tsx`
+- 测试：`backend/tests/copy.test.ts` 20 例全过
+
+---
+
 ### 2026-06-20 · topic-inspiration
 
 **摘要**：实现选题环节——AI 选题生成（种子词 + 频道描述 + 历史数据）、历史导入（粘贴/CSV）、选题工作台前端页，v0.1 首个业务功能闭环。
