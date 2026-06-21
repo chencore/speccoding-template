@@ -168,7 +168,19 @@ export default function TopicsPage() {
         fontFamily: "system-ui, sans-serif",
       }}
     >
-      <h1>选题工作台</h1>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 24,
+        }}
+      >
+        <h1 style={{ margin: 0 }}>选题工作台</h1>
+        <a href="/history" style={{ color: "#666", fontSize: 14 }}>
+          历史记录 →
+        </a>
+      </div>
 
       <Section title="生成选题">
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>

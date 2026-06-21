@@ -38,6 +38,24 @@ export default function Home() {
             生成、导入、筛选选题，并管理频道描述与历史视频。
           </p>
         </a>
+        <a
+          href="/history"
+          style={{
+            padding: "1.5rem",
+            border: "1px solid #eee",
+            borderRadius: "8px",
+            textDecoration: "none",
+            color: "inherit",
+            background: "#fafafa",
+          }}
+        >
+          <h2 style={{ margin: "0 0 0.5rem 0", fontSize: "1.25rem" }}>
+            历史记录
+          </h2>
+          <p style={{ margin: 0, color: "#666", fontSize: "0.95rem" }}>
+            查看已采用选题及其最终文案。
+          </p>
+        </a>
       </nav>
     </main>
   );
