@@ -5,6 +5,7 @@ import { config } from "./config.js";
 import { initDb } from "./db/index.js";
 import { agentRoute } from "./routes/agent.js";
 import { copyRouter } from "./routes/copy.js";
+import { dashboardRouter } from "./routes/dashboard.js";
 import { health } from "./routes/health.js";
 import { historyRouter } from "./routes/history.js";
 import { topicRouter } from "./routes/topic.js";
@@ -25,7 +26,8 @@ const app = new Hono()
   .route("/agent", agentRoute)
   .route("/topics", topicRouter)
   .route("/", copyRouter)
-  .route("/", historyRouter);
+  .route("/", historyRouter)
+  .route("/", dashboardRouter);
 
 serve({ fetch: app.fetch, port: config.port }, (info) => {
   console.log(`backend on http://localhost:${info.port}`);

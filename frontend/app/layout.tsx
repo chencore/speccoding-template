@@ -1,3 +1,5 @@
+import SidebarLayout from "./components/SidebarLayout";
+
 export default function RootLayout({
   children,
 }: {
@@ -5,7 +7,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh">
-      <body>{children}</body>
+      <body style={{ margin: 0, padding: 0 }}>
+        <SidebarLayout>{children}</SidebarLayout>
+      </body>
     </html>
   );
 }

@@ -146,7 +146,7 @@ export default function LibraryPage() {
   return (
     <main
       style={{
-        maxWidth: 900,
+        maxWidth: 1100,
         margin: "0 auto",
         padding: "2rem",
         fontFamily: "system-ui, sans-serif",
