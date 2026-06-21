@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS topics (
   seed TEXT NOT NULL,
   title TEXT NOT NULL,
   rationale TEXT,
+  category TEXT,
   status TEXT NOT NULL DEFAULT 'pending',
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );

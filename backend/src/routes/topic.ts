@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { classifyTopic, isValidCategory } from "../topic/classify.js";
 import { TopicGenerateError, generateTopics } from "../topic/generate.js";
 import { parseImportFile, parseImportText } from "../topic/import.js";
 import {
@@ -6,9 +7,11 @@ import {
   TopicNotFoundError,
   clearImportedVideos,
   getChannelDescription,
+  getTopicById,
   listImportedVideos,
   listTopics,
   setChannelDescription,
+  updateTopicCategory,
   updateTopicStatus,
 } from "../topic/repo.js";
 import { insertImportedVideos } from "../topic/repo.js";
@@ -70,12 +73,51 @@ topicRouter.patch("/:id", async (c) => {
     return c.json({ error: "status (string) is required" }, 400);
   }
   try {
-    const topic = updateTopicStatus(id, body.status);
+    const topic = await updateTopicStatus(id, body.status);
     return c.json(topic);
   } catch (err) {
     if (err instanceof StatusValidationError) {
       return c.json({ error: err.message }, 400);
     }
+    if (err instanceof TopicNotFoundError) {
+      return c.json({ error: err.message }, 404);
+    }
+    throw err;
+  }
+});
+
+topicRouter.patch("/:id/category", async (c) => {
+  const id = Number.parseInt(c.req.param("id"), 10);
+  if (Number.isNaN(id)) {
+    return c.json({ error: "id 非法" }, 400);
+  }
+  const body = await c.req.json().catch(() => ({}));
+
+  if (body?.auto === true) {
+    const topic = getTopicById(id);
+    if (!topic) {
+      return c.json({ error: "topic 不存在" }, 404);
+    }
+    try {
+      const category = await classifyTopic(topic.title, topic.rationale);
+      return c.json(updateTopicCategory(id, category));
+    } catch {
+      return c.json({ error: "AI 分类失败" }, 502);
+    }
+  }
+
+  if (!body?.category || typeof body.category !== "string") {
+    return c.json(
+      { error: "category (string) or auto (true) is required" },
+      400,
+    );
+  }
+  if (!isValidCategory(body.category)) {
+    return c.json({ error: `非法分类：${body.category}` }, 400);
+  }
+  try {
+    return c.json(updateTopicCategory(id, body.category));
+  } catch (err) {
     if (err instanceof TopicNotFoundError) {
       return c.json({ error: err.message }, 404);
     }

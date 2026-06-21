@@ -14,4 +14,9 @@ db.pragma("journal_mode = WAL");
 export function initDb() {
   const schema = readFileSync(join(__dirname, "schema.sql"), "utf-8");
   db.exec(schema);
+
+  const columns = db.pragma("table_info(topics)") as { name: string }[];
+  if (!columns.some((c) => c.name === "category")) {
+    db.exec("ALTER TABLE topics ADD COLUMN category TEXT");
+  }
 }

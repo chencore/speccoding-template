@@ -41,7 +41,7 @@
 ## 4. 数据模型（核心实体）
 
 ### topics
-- `id`, `seed`(种子词/导入来源), `title`(选题标题), `rationale`(AI 推荐理由), `status`(待用/采用/弃用), `created_at`
+- `id`, `seed`(种子词/导入来源), `title`(选题标题), `rationale`(AI 推荐理由), `category`(选题类型，AI 自动分类或手动修正), `status`(待用/采用/弃用), `created_at`
 
 ### copies
 - `id`, `topic_id`(关联选题), `type`(title/description/tags), `adopted_version_id`(当前采用版本), `created_at`

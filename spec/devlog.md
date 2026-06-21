@@ -31,6 +31,30 @@
 
 <!-- 最新条目在最上面 -->
 
+### 2026-06-21 · topic-library
+
+**摘要**：实现选题库——已采纳选题自动进入选题库，由 AI 按预设类型分类，历史记录页升级为按类型分组浏览、筛选、手动修正、一键补分类。
+
+**关键决策**：
+- 分类存在 `topics.category` 单字段，不新建 category 表——单人工具、分类固定且少，单字段更简单
+- 分类在采纳时触发，不在生成时触发——避免对弃用选题浪费 token，分类价值在采纳后更高
+- 预设 7 个分类 + 手动修正，不做自定义分类 CRUD——v0.1 保持简单
+- 旧 adopted 选题保留 category = NULL，页面显示「未分类」并提供「自动分类」按钮补打标签
+- `/history` 直接升级为选题库，不新增独立页面——历史记录与选题库在用户心智上重合
+
+**踩坑 / 经验**：
+- 已有数据库需要加列：schema.sql 更新后，`initDb` 里用 `PRAGMA table_info(topics)` 检测并 `ALTER TABLE ADD COLUMN` 做兼容迁移
+- `updateTopicStatus` 原为同步，因采纳时要异步调用 AI，改为 async；所有调用点（仅路由）同步 await
+- Biome `organizeImports` 需 `biome check --fix --unsafe` 才能自动排序
+
+**相关产出**：
+- 归档位置：`openspec/changes/archive/2026-06-21-topic-library/`
+- 父分支：`version/v0.1`
+- 新增模块：`backend/src/topic/classify.ts`、前端 `/history` 页升级
+- 测试：`backend/tests/topic-library.test.ts` 8 例全过；端到端 46 例全过
+
+---
+
 ### 2026-06-21 · copy-generation
 
 **摘要**：实现文案环节——基于选题一键生成 YouTube 标题（5 版）/ 描述（2 版）/ 标签（1 版），支持版本改写迭代与采用切换，前端 `/topics/:id` 详情页承载生成、查看、采用、改写全流程。

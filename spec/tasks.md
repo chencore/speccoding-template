@@ -23,12 +23,13 @@
 - [x] **topic-inspiration** — 选题灵感生成（AI）+ 历史数据导入（CSV/粘贴）
 - [x] **copy-generation** — 文案生成（标题/描述/标签，多版本 A/B）
 - [x] **persistence-and-history** — SQLite 三表 + 历史记录/版本对比/采用标记 UI
+- [x] **topic-library** — 选题库：采纳选题 AI 自动分类 + 历史页按类型浏览/筛选
 
 ---
 
 ## 进度概览
 
 - 当前版本：v0.1
-- 总任务数：5
-- 已完成：3
+- 总任务数：6
+- 已完成：6
 - 进行中：0

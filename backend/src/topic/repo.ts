@@ -1,4 +1,5 @@
 import { db } from "../db/index.js";
+import { classifyTopic } from "./classify.js";
 
 export type TopicStatus = "pending" | "adopted" | "discarded";
 
@@ -9,6 +10,7 @@ export interface Topic {
   seed: string;
   title: string;
   rationale: string | null;
+  category: string | null;
   status: TopicStatus;
   created_at: string;
 }
@@ -80,7 +82,29 @@ export function createTopic(input: {
     .get(info.lastInsertRowid) as Topic;
 }
 
-export function updateTopicStatus(id: number, status: string): Topic {
+export function getTopicById(id: number): Topic | null {
+  return db
+    .prepare("SELECT * FROM topics WHERE id = ?")
+    .get(id) as Topic | null;
+}
+
+export function updateTopicCategory(
+  id: number,
+  category: string | null,
+): Topic {
+  const info = db
+    .prepare("UPDATE topics SET category = ? WHERE id = ?")
+    .run(category, id);
+  if (info.changes === 0) {
+    throw new TopicNotFoundError(`topic ${id} 不存在`);
+  }
+  return db.prepare("SELECT * FROM topics WHERE id = ?").get(id) as Topic;
+}
+
+export async function updateTopicStatus(
+  id: number,
+  status: string,
+): Promise<Topic> {
   assertStatus(status);
   const info = db
     .prepare("UPDATE topics SET status = ? WHERE id = ?")
@@ -88,6 +112,18 @@ export function updateTopicStatus(id: number, status: string): Topic {
   if (info.changes === 0) {
     throw new TopicNotFoundError(`topic ${id} 不存在`);
   }
+
+  if (status === "adopted") {
+    const topic = getTopicById(id);
+    if (topic && !topic.category) {
+      const category = await classifyTopic(topic.title, topic.rationale);
+      db.prepare("UPDATE topics SET category = ? WHERE id = ?").run(
+        category,
+        id,
+      );
+    }
+  }
+
   return db.prepare("SELECT * FROM topics WHERE id = ?").get(id) as Topic;
 }
 
