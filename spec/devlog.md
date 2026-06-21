@@ -31,6 +31,29 @@
 
 <!-- 最新条目在最上面 -->
 
+### 2026-06-21 · home-dashboard
+
+**摘要**：将首页升级为产品工作台仪表盘，新增全局左侧导航，后端聚合 dashboard 数据，前端展示今日计划、今日机会、进行中内容/本周产出/最近文案 widgets，v0.2 首个能力落地。
+
+**关键决策**：
+- 新增 dashboard 聚合接口 `GET /api/v1/dashboard/stats`，一次返回首页全部数据，避免前端请求瀑布
+- pending 选题指标用确定性 hash 模拟（trendScore/audienceMatch/freshness/signalSource），真实算法留后续数据分析环节
+- 全局 `SidebarLayout` 包裹所有页面，为脚本/视频/音频/数据分析预留「即将开放」占位入口
+- 现有页面 `<main>` 宽度从 900 放宽到 1100、去掉 `margin: 0 auto`，更好利用侧边栏右侧空间
+
+**踩坑 / 经验**：
+- 变更归档时发现 tasks.md 中 10 项任务均未勾选（实际已完成），已征得确认后继续归档
+- 设计.md 含跨模块影响（dashboard 模块 + 全局布局），已同步到 `spec/design.md`
+- 合并前发现所有改动均在工作区未提交，stash → 切回 feature 分支 → commit → 再 merge 回 version/v0.2
+
+**相关产出**：
+- 归档位置：`openspec/changes/archive/2026-06-21-home-dashboard/`
+- 父分支：`version/v0.2`
+- 新增模块：`backend/src/dashboard/*`、`backend/src/routes/dashboard.ts`、`frontend/app/components/SidebarLayout.tsx`、首页仪表盘
+- 测试：`backend/tests/dashboard.test.ts` 6 例全过；端到端 lint/test/build 均通过
+
+---
+
 ### 2026-06-21 · topic-library
 
 **摘要**：实现选题库——已采纳选题自动进入选题库，由 AI 按预设类型分类，历史记录页升级为按类型分组浏览、筛选、手动修正、一键补分类。
